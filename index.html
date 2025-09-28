@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>777 Archive</title>
+  <style>
+    :root {
+      --primary-color: #4285f4;
+      --secondary-color: #34a853;
+      --background-color: #f5f5f5;
+      --card-color: #ffffff;
+      --text-color: #333333;
+      --border-color: #dddddd;
+      --hover-color: #e8f0fe;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; }
+    body { background: var(--background-color); color: var(--text-color); padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+    .logo { display: flex; align-items: center; font-size: 24px; font-weight: bold; color: var(--primary-color); }
+    .logo i { margin-right: 10px; font-size: 28px; }
+    .search-bar { flex-grow: 1; margin: 0 20px; position: relative; }
+    .search-bar input { width: 100%; padding: 10px 15px; border-radius: 24px; border: 1px solid var(--border-color); font-size: 16px; }
+    .search-bar input:focus { box-shadow: 0 0 5px rgba(66,133,244,0.3); }
+    .search-bar .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #70757a; }
+    .breadcrumb { display: flex; flex-wrap: wrap; margin-bottom: 20px; }
+    .breadcrumb-item { padding: 5px 10px; background: var(--card-color); border-radius: 4px; margin-right: 10px; margin-bottom: 5px; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+    .breadcrumb-item:hover { background: var(--hover-color); }
+    .actions-bar { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .view-toggle { display: flex; gap: 10px; }
+    .view-btn { background: var(--card-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 5px 10px; cursor: pointer; }
+    .view-btn.active { background: var(--primary-color); color: white; }
+    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 20px; }
+    .file-card { background: var(--card-color); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; }
+    .file-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); background: var(--hover-color); }
+    .file-icon { height: 150px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; }
+    .file-icon i { font-size: 64px; color: var(--primary-color); }
+    .file-icon img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .file-info { padding: 15px; }
+    .file-name { font-weight: 500; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-meta { font-size: 12px; color: #70757a; }
+    .download-link { display: block; margin-top: 8px; text-align: center; padding: 6px; background: var(--primary-color); color: #fff; border-radius: 4px; font-size: 14px; text-decoration: none; }
+    .download-link:hover { background: #3367d6; }
+    .file-list { width: 100%; border-collapse: collapse; }
+    .file-list th, .file-list td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    .file-list th { background: var(--card-color); font-weight: 500; }
+    .file-list tr:hover { background: var(--hover-color); cursor: pointer; }
+    .file-list-icon { font-size: 18px; color: var(--primary-color); margin-right: 10px; }
+    .loading { display: flex; justify-content: center; align-items: center; height: 200px; }
+    .spinner { border: 4px solid rgba(0,0,0,0.1); border-left-color: var(--primary-color); border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0%{transform:rotate(0)}100%{transform:rotate(360deg)} }
+    .no-files { text-align: center; padding: 50px 0; color: #70757a; font-size: 18px; }
+    .theme-toggle { background: none; border: none; font-size: 20px; cursor: pointer; }
+    body.dark-theme { --primary-color: #8ab4f8; --secondary-color: #81c995; --background-color: #202124; --card-color: #303134; --text-color: #e8eaed; --border-color: #5f6368; --hover-color: #3c4043; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-content { background: var(--card-color); padding: 20px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .modal-title { font-size: 20px; font-weight: bold; }
+    .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); }
+    .preview-content { text-align: center; margin-bottom: 20px; }
+    .preview-content img, .preview-content video { max-width: 100%; max-height: 300px; }
+    .download-btn { display: block; background: var(--primary-color); color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; }
+    .download-btn:hover { background: #3367d6; }
+    .file-details { margin-top: 15px; font-size: 14px; }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo"><i class="fas fa-cloud"></i><span>777 Archive</span></div>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search files...">
+        <i class="fas fa-search search-icon"></i>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode"><i class="fas fa-moon"></i></button>
+    </header>
+
+    <div class="breadcrumb" id="breadcrumb"><div class="breadcrumb-item" data-path="/">Home</div></div>
+
+    <div class="actions-bar">
+      <div class="view-toggle">
+        <button class="view-btn active" id="grid-view-btn"><i class="fas fa-th"></i></button>
+        <button class="view-btn" id="list-view-btn"><i class="fas fa-list"></i></button>
+      </div>
+    </div>
+
+    <div id="content-area"><div class="loading"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="modal" id="file-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">File Preview</h2>
+        <button class="close-modal" id="close-modal">&times;</button>
+      </div>
+      <div class="preview-content" id="preview-content"></div>
+      <a href="#" class="download-btn" id="download-btn" download>⬇ Download</a>
+      <div class="file-details" id="file-details"></div>
+    </div>
+  </div>
+
+<script>
+let fileSystem={}, currentPath="/", currentView="grid", currentSearch="";
+const contentArea=document.getElementById("content-area"), breadcrumb=document.getElementById("breadcrumb"), searchInput=document.getElementById("search-input");
+const gridBtn=document.getElementById("grid-view-btn"), listBtn=document.getElementById("list-view-btn"), themeToggle=document.getElementById("theme-toggle");
+const modal=document.getElementById("file-modal"), modalTitle=document.getElementById("modal-title"), preview=document.getElementById("preview-content"), dlBtn=document.getElementById("download-btn"), details=document.getElementById("file-details");
+document.getElementById("close-modal").onclick=()=>modal.style.display="none"; window.onclick=e=>{if(e.target===modal)modal.style.display="none";};
+
+themeToggle.onclick=()=>{const d=document.body.classList.toggle("dark-theme");themeToggle.innerHTML=d?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';localStorage.setItem("darkMode",d)};
+gridBtn.onclick=()=>{currentView="grid";gridBtn.classList.add("active");listBtn.classList.remove("active");render()};
+listBtn.onclick=()=>{currentView="list";listBtn.classList.add("active");gridBtn.classList.remove("active");render()};
+searchInput.oninput=()=>{currentSearch=searchInput.value.toLowerCase();render()};
+
+async function loadFiles(){try{const res=await fetch("files/files.json");fileSystem=await res.json();renderBreadcrumb();render()}catch(e){contentArea.innerHTML="<p style='color:red'>⚠ Failed to load files.json</p>"}}
+function getDir(path){const parts=path.split("/").filter(Boolean);let node=fileSystem;for(const p of parts){if(node.children&&node.children[p])node=node.children[p];else return null}return node}
+function navigateTo(path){currentPath=path;renderBreadcrumb();render()}
+function renderBreadcrumb(){breadcrumb.innerHTML="";const home=document.createElement("div");home.className="breadcrumb-item";home.textContent="Home";home.onclick=()=>navigateTo("/");breadcrumb.appendChild(home);
+if(currentPath!=="/"){const parts=currentPath.split("/").filter(Boolean);let p="";for(const seg of parts){p+="/"+seg;const el=document.createElement("div");el.className="breadcrumb-item";el.textContent=seg;el.onclick=()=>navigateTo(p);breadcrumb.appendChild(el)}}}
+function render(){const dir=getDir(currentPath);if(!dir||dir.type!=="directory"){contentArea.innerHTML="<div class='no-files'>Directory not found</div>";return;}
+const items=Object.entries(dir.children).filter(([n])=>n.toLowerCase().includes(currentSearch));if(!items.length){contentArea.innerHTML="<div class='no-files'>No files found</div>";return;}
+if(currentView==="grid"){const grid=document.createElement("div");grid.className="file-grid";for(const [n,it] of items)grid.appendChild(makeCard(n,it));contentArea.innerHTML="";contentArea.appendChild(grid);}
+else{const table=document.createElement("table");table.className="file-list";table.innerHTML="<thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th><th></th></tr></thead>";const tb=document.createElement("tbody");for(const [n,it] of items)tb.appendChild(makeRow(n,it));table.appendChild(tb);contentArea.innerHTML="";contentArea.appendChild(table);}}
+function makeCard(n,it){const card=document.createElement("div");card.className="file-card";if(it.type==="directory"){card.innerHTML=`<div class="file-icon"><i class="fas fa-folder"></i></div><div class="file-info"><div class="file-name">${n}</div><div class="file-meta">Folder</div></div>`;card.onclick=()=>navigateTo(currentPath+(currentPath==="/"?"":"/")+n);}else{card.innerHTML=`<div class="file-icon"><i class="${getIcon(it.mimeType)}"></i></div><div class="file-info"><div class="file-name">${n}</div><div class="file-meta">${formatSize(it.size)} · ${formatDate(it.lastModified)}</div><a href="${it.url}" download="${n}" class="download-link">⬇ Download</a></div>`;card.onclick=()=>showPreview(n,it);}return card;}
+function makeRow(n,it){const row=document.createElement("tr");if(it.type==="directory"){row.innerHTML=`<td><i class="fas fa-folder file-list-icon"></i> ${n}</td><td>Folder</td><td>—</td><td>—</td><td></td>`;row.onclick=()=>navigateTo(currentPath+(currentPath==="/"?"":"/")+n);}else{row.innerHTML=`<td><i class="${getIcon(it.mimeType)} file-list-icon"></i> ${n}</td><td>${getType(it.mimeType)}</td><td>${formatSize(it.size)}</td><td>${formatDate(it.lastModified)}</td><td><a href="${it.url}" download="${n}" class="download-link">⬇</a></td>`;row.onclick=()=>showPreview(n,it);}return row;}
+function showPreview(n,f){modalTitle.textContent=n;preview.innerHTML="";dlBtn.href=f.url;dlBtn.download=n;if(f.mimeType.startsWith("image/"))preview.innerHTML=`<img src="${f.url}" style="max-width:100%">`;else if(f.mimeType.startsWith("video/"))preview.innerHTML=`<video controls src="${f.url}" style="max-width:100%"></video>`;else if(f.mimeType.startsWith("audio/"))preview.innerHTML=`<audio controls src="${f.url}"></audio>`;else if(f.mimeType==="application/pdf")preview.innerHTML=`<embed src="${f.url}" type="application/pdf" style="width:100%;height:300px">`;else preview.innerHTML=`<p>No preview available</p>`;details.innerHTML=`<p><b>Type:</b> ${getType(f.mimeType)}</p><p><b>Size:</b> ${formatSize(f.size)}</p><p><b>Modified:</b> ${formatDate(f.lastModified)}</p>`;modal.style.display="flex";}
+function getIcon(m){if(!m)return"far fa-file";if(m.startsWith("image/"))return"far fa-file-image";if(m.startsWith("video/"))return"far fa-file-video";if(m.startsWith("audio/"))return"far fa-file-audio";if(m==="application/pdf")return"far fa-file-pdf";if(m.includes("zip")||m.includes("tar"))return"far fa-file-archive";return"far fa-file";}
+function getType(m){if(!m)return"File";if(m.startsWith("image/"))return"Image";if(m.startsWith("video/"))return"Video";if(m.startsWith("audio/"))return"Audio";if(m==="application/pdf")return"PDF";if(m.includes("zip"))return"ZIP";return"File";}
+function formatSize(b){if(!b)return"?";const u=["B","KB","MB","GB"];let i=0;while(b>=1024&&i<u.length-1){b/=1024;i++;}return b.toFixed(1)+" "+u[i]}
+function formatDate(d){return new Date(d).toLocaleString()}
+loadFiles();
+</script>
+</body>
+</html>
